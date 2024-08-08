@@ -11,6 +11,8 @@ from googleapiclient.errors import HttpError
 # Google Sheets setup
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = 'path/to/your/credentials.json'
+SERVICE_ACCOUNT_FILE = '/Users/selengecagin/Downloads/numeric-skill-431918-p2-13418f071b50.json'
+
 
 def create_sheet(service, title):
     spreadsheet = {
