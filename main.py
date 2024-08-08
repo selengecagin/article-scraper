@@ -66,7 +66,7 @@ try:
     # Prepare data for Google Sheets
     sheet_data = [['Title', 'Link']]  # Header row
 
-    for page in range(1, 21):  # Loop through the first 20 pages
+    for page in range(1, 4):  # Loop through the first 20 pages
         url = f"https://code-maze.com/latest-posts-on-code-maze/page/{page}/"
         driver.get(url)
         print(f"Navigating to: {url}")
