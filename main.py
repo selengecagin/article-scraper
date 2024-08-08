@@ -10,30 +10,39 @@ from webdriver_manager.chrome import ChromeDriverManager
 driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 try:
-    # Navigate to "https://code-maze.com/"
-    driver.get("https://code-maze.com/latest-posts-on-code-maze/")
+    # Open the JSONL file in append mode
+    with open("titles.jsonl", "a") as f:
+        for page in range(1, 21):  # Loop through the first 20 pages
+            # Navigate to the page
+            url = f"https://code-maze.com/latest-posts-on-code-maze/page/{page}/"
+            driver.get(url)
+            print(f"Navigating to: {url}")
 
-    # Wait 2 seconds
-    time.sleep(2)
+            # Wait 2 seconds
+            time.sleep(2)
 
-    # Find <h2> elements with class "entry-title"
-    titles = driver.find_elements(By.CSS_SELECTOR, "h2.entry-title")
+            # Find <h2> elements with class "entry-title"
+            titles = driver.find_elements(By.CSS_SELECTOR, "h2.entry-title")
 
-    # get the href value of the first <a> element in the <h2> element
-    for title in titles:
-        # Print the text of the <a> element
-        print(title.find_element(By.CSS_SELECTOR, "a").text)
-
-        # Print the href attribute of the <a> element
-        print(title.find_element(By.CSS_SELECTOR, "a").get_attribute("href"))
-
-        # Save the data to a JSONL file
-        with open("titles.jsonl", "w") as f:
+            # Get the href value of the first <a> element in the <h2> element
             for title in titles:
-                title_text = title.find_element(By.CSS_SELECTOR, "a").text
-                title_link = title.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
-                json_line = json.dumps({"title": title_text, "link": title_link})
-                f.write(json_line + "\n")
+                try:
+                    # Print the text of the <a> element
+                    title_text = title.find_element(By.CSS_SELECTOR, "a").text
+                    print(title_text)
+
+                    # Print the href attribute of the <a> element
+                    title_link = title.find_element(By.CSS_SELECTOR, "a").get_attribute("href")
+                    print(title_link)
+
+                    # Save the data to a JSONL file
+                    json_line = json.dumps({"title": title_text, "link": title_link})
+                    f.write(json_line + "\n")
+                except Exception as e:
+                    print(f"Error processing title: {e}")
+
+                # Wait 2 seconds
+                time.sleep(2)
 
 finally:
     # Close the browser after a short delay to see the result
