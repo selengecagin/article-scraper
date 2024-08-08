@@ -12,6 +12,7 @@ driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install())
 try:
     # Open the JSONL file in append mode
     with open("titles.jsonl", "a") as f:
+        all_titles = []
         for page in range(1, 21):  # Loop through the first 20 pages
             # Navigate to the page
             url = f"https://code-maze.com/latest-posts-on-code-maze/page/{page}/"
@@ -23,6 +24,9 @@ try:
 
             # Find <h2> elements with class "entry-title"
             titles = driver.find_elements(By.CSS_SELECTOR, "h2.entry-title")
+
+            # Add the titles to the all_titles list
+            all_titles.extend(titles)
 
             # Get the href value of the first <a> element in the <h2> element
             for title in titles:
@@ -44,6 +48,8 @@ try:
                 # Wait 2 seconds
                 time.sleep(2)
 
+        # Print the total number of titles
+        print(f"Total number of titles: {len(all_titles)}")
 finally:
     # Close the browser after a short delay to see the result
     time.sleep(5)
