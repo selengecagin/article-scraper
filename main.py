@@ -9,10 +9,9 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # Google Sheets setup
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = 'path/to/your/credentials.json'
 SERVICE_ACCOUNT_FILE = '/Users/selengecagin/Downloads/numeric-skill-431918-p2-13418f071b50.json'
-
 
 def create_sheet(service, title):
     spreadsheet = {
@@ -31,6 +30,21 @@ def update_sheet(service, spreadsheet_id, data):
         spreadsheetId=spreadsheet_id, range='A1',
         valueInputOption='RAW', body=body).execute()
 
+def share_sheet(drive_service, spreadsheet_id, email_addresses):
+    for email in email_addresses:
+        permission = {
+            'type': 'user',
+            'role': 'writer',
+            'emailAddress': email
+        }
+        drive_service.permissions().create(
+            fileId=spreadsheet_id,
+            body=permission,
+            fields='id',
+            sendNotificationEmail=True
+        ).execute()
+    print(f"Sheet shared with: {', '.join(email_addresses)}")
+
 # Setup the WebDriver
 driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
@@ -38,11 +52,16 @@ try:
     # Google Sheets Authentication
     creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
     sheets_service = build('sheets', 'v4', credentials=creds)
+    drive_service = build('drive', 'v3', credentials=creds)
 
     # Create a new Google Sheet
     sheet_title = f"Code Maze Articles - {time.strftime('%Y-%m-%d %H:%M:%S')}"
     spreadsheet_id = create_sheet(sheets_service, sheet_title)
     print(f"Created new Google Sheet with ID: {spreadsheet_id}")
+
+    # Share the sheet with specified email addresses
+    email_addresses = ['user1@example.com', 'user2@example.com']  # Add your desired email addresses here
+    share_sheet(drive_service, spreadsheet_id, email_addresses)
 
     # Prepare data for Google Sheets
     sheet_data = [['Title', 'Link']]  # Header row
